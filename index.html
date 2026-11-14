@@ -1,0 +1,306 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>MARSWALK — Mars EVA Planner</title>
+<meta name="generator" content="SI-assisted code: Claude (Anthropic)">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--ac:#ff6a3d;--cy:#5df0ff;--tx:#e8edf5;--mu:#8a97ab;--pn:rgba(10,13,22,.8);--ln:rgba(255,255,255,.12);color-scheme:dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden;background:#04050a;color:var(--tx);font:400 14px 'Space Grotesk',system-ui,sans-serif;user-select:none}
+canvas{position:fixed;inset:0;touch-action:none}
+.brand{position:fixed;left:22px;top:18px;pointer-events:none}.brand b{font:700 26px 'Space Grotesk';letter-spacing:.32em}.brand b i{color:var(--ac);font-style:normal}
+.brand small{display:block;font:400 11px 'Space Mono',monospace;color:var(--mu);letter-spacing:.14em;margin-top:2px}
+#list{position:fixed;left:22px;top:92px;width:230px;display:flex;flex-direction:column;gap:8px}
+.it{background:var(--pn);border:1px solid var(--ln);border-left:3px solid transparent;border-radius:8px;padding:9px 11px;cursor:pointer;text-align:left;color:var(--tx);font:inherit;transition:.15s}
+.it:hover,.it.on{border-left-color:var(--ac);background:rgba(40,20,14,.85);transform:translateX(3px)}
+.it b{display:block;font-weight:600;font-size:14px}.it span{font:400 10.5px 'Space Mono',monospace;color:var(--mu)}
+#card{position:fixed;right:22px;bottom:22px;width:330px;background:var(--pn);border:1px solid var(--ln);border-radius:14px;padding:16px;transform:translateY(20px);opacity:0;pointer-events:none;transition:.3s}
+#card.on{transform:none;opacity:1;pointer-events:auto}
+#card h2{margin:0;font:700 24px 'Space Grotesk';letter-spacing:.02em}#card .k{color:var(--cy);font:400 11px 'Space Mono',monospace;letter-spacing:.1em;margin:4px 0 8px;text-transform:uppercase}
+#card p{margin:0 0 12px;color:#b7c1d1;line-height:1.5}#card .co{font:400 11px 'Space Mono',monospace;color:var(--mu);margin-bottom:12px}
+.go{width:100%;padding:12px;border:0;border-radius:9px;font:700 14px 'Space Grotesk';letter-spacing:.16em;color:#1a0904;background:linear-gradient(90deg,#ff6a3d,#ffb347);cursor:pointer}.go[disabled]{background:#2a303c;color:var(--mu);cursor:not-allowed}
+#x{position:absolute;right:12px;top:10px;background:none;border:0;color:var(--mu);font-size:20px;cursor:pointer}
+#tel{position:fixed;left:22px;bottom:20px;font:400 11px 'Space Mono',monospace;color:var(--mu);line-height:1.7;pointer-events:none}#tel b{color:var(--cy);font-weight:400}
+#tr{position:fixed;right:22px;top:18px;display:flex;gap:8px}#tr button{background:var(--pn);border:1px solid var(--ln);color:var(--tx);border-radius:99px;padding:7px 14px;font:400 11px 'Space Mono',monospace;cursor:pointer;letter-spacing:.1em}
+#intro{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 45%,rgba(4,5,10,.55),rgba(4,5,10,.93));transition:opacity .9s;text-align:center;padding:20px}
+#intro.off{opacity:0;pointer-events:none}#intro h1{margin:0;font:700 clamp(40px,9vw,104px) 'Space Grotesk';letter-spacing:.3em;margin-right:-.3em;animation:ex 2.4s ease-out both;background:linear-gradient(180deg,#fff,#ff8a5c 70%,#a33a1c);-webkit-background-clip:text;background-clip:text;color:transparent}
+@keyframes ex{from{letter-spacing:.9em;opacity:0}to{letter-spacing:.3em;opacity:1}}
+#intro p{font:400 13px 'Space Mono',monospace;color:var(--mu);letter-spacing:.2em;margin:14px 0 30px;max-width:520px;line-height:1.7}
+#enter{padding:14px 34px;border:1px solid var(--ac);border-radius:99px;background:rgba(255,106,61,.08);color:var(--ac);font:700 14px 'Space Grotesk';letter-spacing:.3em;cursor:pointer;transition:.2s}#enter:hover:not([disabled]){background:var(--ac);color:#150700}#enter[disabled]{opacity:.5;cursor:wait}
+#pg{width:200px;height:2px;background:#222;margin-top:20px;overflow:hidden}#pg i{display:block;height:100%;width:0;background:var(--ac)}
+#hint{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);font:400 11px 'Space Mono',monospace;color:var(--mu);letter-spacing:.12em;pointer-events:none;white-space:nowrap}
+@media(max-width:760px){#list{top:auto;bottom:56px;left:0;right:0;width:auto;flex-direction:row;overflow-x:auto;padding:0 12px}.it{min-width:150px}#card{left:12px;right:12px;width:auto;top:70px;bottom:auto}#tel,#hint{display:none}}
+#ops{position:fixed;inset:0;z-index:50;background:#05060b;display:none;grid-template-columns:1fr 340px}
+#ops.on{display:grid;animation:oi .8s ease-out}@keyframes oi{from{opacity:0;filter:brightness(3) blur(6px)}}
+#mw{position:relative;overflow:hidden;background:radial-gradient(circle at 50% 50%,#10141f,#05060b)}
+#oc{position:absolute;inset:0;width:100%;height:100%;cursor:crosshair}
+#mw::after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(93,240,255,.035) 0 1px,transparent 1px 3px);box-shadow:inset 0 0 120px rgba(0,0,0,.7)}
+.hd{position:absolute;font:400 11px 'Space Mono',monospace;color:var(--cy);letter-spacing:.12em;pointer-events:none;z-index:2;text-shadow:0 0 8px #000;line-height:1.7}
+.hd.tl{left:18px;top:14px}.hd.tr{right:18px;top:14px;text-align:right}.hd.bl{left:18px;bottom:14px;color:var(--tx)}.hd.bl b{color:var(--cy);font-weight:400}
+.cn{position:absolute;width:26px;height:26px;border:2px solid var(--ac);pointer-events:none;z-index:2}.cn.a{left:8px;top:8px;border-right:0;border-bottom:0}.cn.b{right:8px;top:8px;border-left:0;border-bottom:0}.cn.c{left:8px;bottom:8px;border-right:0;border-top:0}.cn.d{right:8px;bottom:8px;border-left:0;border-top:0}
+#fm{position:absolute;left:50%;top:50px;transform:translateX(-50%);background:rgba(240,50,60,.92);color:#fff;padding:7px 16px;border-radius:6px;font:700 12px 'Space Mono';letter-spacing:.1em;opacity:0;transition:.3s;z-index:3;pointer-events:none}#fm.on{opacity:1}
+#pnl{background:rgba(10,13,22,.96);border-left:1px solid var(--ln);overflow-y:auto;padding:14px 16px 20px}
+#pnl .ph b{display:block;font:700 22px 'Space Grotesk';letter-spacing:.14em}#pnl .ph span{font:400 10.5px 'Space Mono';color:var(--cy);letter-spacing:.14em}
+#pnl h4{margin:16px 0 7px;font:700 10.5px 'Space Mono';letter-spacing:.2em;color:var(--ac);border-bottom:1px solid var(--ln);padding-bottom:4px}
+.b{background:rgba(255,255,255,.05);border:1px solid var(--ln);color:var(--tx);border-radius:6px;padding:7px 9px;font:400 11px 'Space Mono',monospace;cursor:pointer;letter-spacing:.05em;text-align:left}.b:hover{border-color:var(--cy)}.b.on{background:rgba(93,240,255,.14);border-color:var(--cy);color:var(--cy)}
+#o-ly,.row,#o-tg{display:grid;gap:6px}#o-ly{grid-template-columns:1fr 1fr}.row{grid-template-columns:repeat(3,1fr);margin-top:8px}#o-tg{margin-top:8px}.ph .b{float:right;margin-top:-34px}
+#pnl label{display:flex;justify-content:space-between;font:400 11px 'Space Mono';color:var(--mu);margin:8px 0 3px}#pnl label b{color:var(--cy);font-weight:400}#pnl input[type=range]{width:100%;accent-color:#ff6a3d}.ck{justify-content:flex-start!important;gap:8px}
+.lg{height:10px;border-radius:5px;margin:10px 0 3px}.lgl{display:flex;justify-content:space-between;font:400 10px 'Space Mono';color:var(--mu)}.chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}.chips i{font:400 10px 'Space Mono';font-style:normal;padding:3px 7px;border-radius:99px;color:#111}
+.sg{display:grid;grid-template-columns:1fr 1fr;gap:6px}.sg div{background:rgba(255,255,255,.04);border:1px solid var(--ln);border-radius:6px;padding:7px 9px;font:400 10px 'Space Mono';color:var(--mu)}.sg b{display:block;font:700 16px 'Space Grotesk';color:var(--tx);margin-top:2px}
+#chip{margin:8px 0;padding:11px;border-radius:8px;text-align:center;font:700 16px 'Space Grotesk';letter-spacing:.22em}.go2{background:rgba(40,200,120,.18);color:#37e08c;border:1px solid #37e08c}.ca{background:rgba(240,200,40,.15);color:#f0d03c;border:1px solid #f0d03c}.ng{background:rgba(240,50,60,.18);color:#ff5560;border:1px solid #ff5560}
+.nt{font:400 10px/1.6 'Space Mono';color:var(--mu);margin:12px 0 0}
+#boot{display:none;position:absolute;inset:0;z-index:9;background:#02030a;flex-direction:column;justify-content:center;padding:0 12%;font:400 13px 'Space Mono';color:var(--cy);gap:9px;letter-spacing:.1em}
+#boot.run{display:flex;animation:bo .7s 2.4s forwards}#boot div{opacity:0;animation:bl .3s forwards}@keyframes bl{to{opacity:1}}@keyframes bo{to{opacity:0;visibility:hidden}}
+@media(max-width:860px){#ops.on{grid-template-columns:1fr;grid-template-rows:52% 48%}#pnl{border-left:0;border-top:1px solid var(--ln)}}
+</style></head><body>
+<canvas id="c"></canvas>
+<div class="brand"><b>MARS<i>WALK</i></b><small>SURFACE NAVIGATION FOR THE FIRST HUMANS ON MARS</small></div>
+<nav id="list"></nav>
+<div id="tr"><button id="snd">SOUND: ON</button><input type="file" id="fl" accept="image/*" hidden>
+<button id="lt">LOAD TEXTURE</button><button id="sv">SAVE TEX</button></div>
+<div id="card"><button id="x">×</button><div class="k" id="ck"></div><h2 id="cn"></h2><div class="co" id="cc"></div><p id="ct"></p><button class="go" id="go"></button></div>
+<div id="tel"></div><div id="hint">DRAG · ROTATE &nbsp;|&nbsp; SCROLL / PINCH · ZOOM &nbsp;|&nbsp; CLICK A BEACON</div>
+<div id="intro"><h1>MARSWALK</h1><p>INTERPLANETARY SURVIVAL GUIDE<br>PICK A LANDING SITE. PLAN YOUR MARSWALK.</p><button id="enter" disabled>CALIBRATING…</button><div id="pg"><i id="pgi"></i></div></div>
+<div id="ops"><div id="boot"><div id="o-b1" style="animation-delay:.1s"></div><div style="animation-delay:.5s">▸ TOPOGRAPHY LAYER (MGS MOLA / MRO HiRISE) ............ OK</div><div style="animation-delay:.9s">▸ THERMAL LAYER (ODY THEMIS) .......................... OK</div><div style="animation-delay:1.3s">▸ SPECTRAL LAYER (MRO CRISM) .......................... OK</div><div style="animation-delay:1.7s">▸ RADIATION LAYER (MSL RAD) ........................... OK</div><div style="animation-delay:2.1s;color:#ff6a3d">▸ EVA SAFETY ENGINE ONLINE — CLICK THE MAP TO PLAN</div></div>
+<main id="mw"><canvas id="oc"></canvas><i class="cn a"></i><i class="cn b"></i><i class="cn c"></i><i class="cn d"></i>
+<div class="hd tl" id="o-tl"></div><div class="hd tr" id="clk"></div><div class="hd bl" id="rd"></div><div id="fm"></div></main>
+<aside id="pnl"><div class="ph"><b id="o-nm"></b><span>EVA ROUTE PLANNER</span><button class="b" id="o-bk">← GLOBE</button></div>
+<h4>DATA LAYERS</h4><div id="o-ly"></div><div id="o-lg"></div>
+<h4>CONDITIONS</h4><label>LOCAL SOL TIME <b id="o-tv"></b></label><input type="range" id="o-tm" min="0" max="24.6" step=".1" value="9">
+<label class="ck"><input type="checkbox" id="o-sp"> SOLAR STORM SCENARIO (DOSE ×4)</label>
+<h4>MISSION</h4><div class="row" style="grid-template-columns:1fr 1fr"><button class="b on" id="m0">ON FOOT</button><button class="b" id="m1">ROVER-ASSISTED</button></div>
+<label class="ck"><input type="checkbox" id="rt" checked> RETURN TO HAB (ROUND TRIP)</label>
+<div id="o-tg"></div><div class="row"><button class="b" id="o-un">UNDO</button><button class="b" id="o-cl">CLEAR</button><button class="b" id="o-bm">BASEMAP</button><input type="file" id="o-fl" accept="image/*" hidden></div>
+<h4>EVA BRIEFING</h4><div id="o-st"></div>
+<p class="nt">Terrain is a procedural stand-in calibrated to published site elevations and the MSL RAD dose (≈ 0.64 mSv/day). Use BASEMAP to overlay a real HiRISE / CTX crop from Mars Trek.</p></aside></div>
+<script>
+/* ============ 1. SETUP ============ */
+const $=i=>document.getElementById(i),D=Math.PI/180,cl=(v,a,b)=>Math.max(a,Math.min(b,v)),sm=(a,b,x)=>{x=cl((x-a)/(b-a),0,1);return x*x*(3-2*x)};
+const PLANNER='marswalk.html'; // route-planner app (step 2: merge it into this page)
+// Real coordinates (lat °N, lon °E). Add a site = add a line. "ready" = has a local terrain map.
+const SITES=[
+{n:'Gale Crater',la:-5.4,lo:137.8,k:'Curiosity · Mount Sharp',t:'Layered sulfate mound rising ~5 km inside a 154 km crater. Boxwork ridges were studied here.',ready:1},
+{n:'Jezero Crater',la:18.4,lo:77.5,k:'Perseverance · ancient delta',t:'A dry river delta that once fed a crater lake: prime target for biosignature sampling.'},
+{n:'Olympus Mons',la:18.65,lo:-133.8,k:'Tallest volcano known',t:'Shield volcano ~22 km high. Steep scarps, lava tubes and very thin, cold air at the summit.'},
+{n:'Valles Marineris',la:-13.9,lo:-59.2,k:'4,000 km canyon system',t:'Canyon walls expose kilometers of layered crust. Rockfall and steep slopes dominate the hazards.'},
+{n:'Meridiani Planum',la:-1.95,lo:-5.5,k:'Opportunity · hematite plains',t:'Flat, hematite-rich plains: easy walking and a strong spectral signature of past water.'},
+{n:'Hellas Planitia',la:-42.4,lo:70.5,k:'Deepest impact basin',t:'Floor sits ~7 km below the datum: thicker air, less radiation, seasonal frost.'}];
+/* ============ 2. PROCEDURAL MARS TEXTURE ============ */
+// 3D value noise (not 2D!) so the map has no seam at the poles or at lon ±180.
+const TW=1024,TH=512,TC=new Uint8ClampedArray(TW*TH*3),TZ=new Float32Array(TW*TH);
+const h3=(x,y,z)=>{let h=(Math.imul(x,374761393)^Math.imul(y,668265263)^Math.imul(z,2147483647))|0;h=Math.imul(h^(h>>>13),1274126177);return((h^(h>>>16))>>>0)/4294967295};
+const L=(a,b,t)=>a+(b-a)*t;
+function n3(x,y,z){const X=Math.floor(x),Y=Math.floor(y),Z=Math.floor(z),a=x-X,b=y-Y,d=z-Z,u=a*a*(3-2*a),v=b*b*(3-2*b),w=d*d*(3-2*d);
+return L(L(L(h3(X,Y,Z),h3(X+1,Y,Z),u),L(h3(X,Y+1,Z),h3(X+1,Y+1,Z),u),v),L(L(h3(X,Y,Z+1),h3(X+1,Y,Z+1),u),L(h3(X,Y+1,Z+1),h3(X+1,Y+1,Z+1),u),v),w)}
+const f3=(x,y,z,o)=>{let s=0,a=.5,f=1;for(let i=0;i<o;i++){s+=a*n3(x*f,y*f,z*f);f*=2.1;a*=.5}return s};
+const V=(la,lo)=>[Math.cos(la*D)*Math.cos(lo*D),Math.sin(la*D),Math.cos(la*D)*Math.sin(lo*D)]; // lat/lon -> 3D unit vector
+const Q={th:V(0,-105),ol:V(18.65,-133.8),he:V(-42.4,70.5),sy:V(8,69),ac:V(48,-25),sr:V(-35,-150),ga:V(-5.4,137.8),je:V(18.4,77.5),me:V(-1.95,-5.5)};
+const gs=(p,q,s)=>{const a=Math.acos(cl(p[0]*q[0]+p[1]*q[1]+p[2]*q[2],-1,1))/D;return Math.exp(-((a/s)**2))}; // gaussian blob around a real feature
+function genRows(y0,y1){for(let y=y0;y<y1;y++)for(let x=0;x<TW;x++){const lat=(.5-(y+.5)/TH)*180,lon=(x+.5)/TW*360-180,p=V(lat,lon);
+let h=f3(p[0]*2.4,p[1]*2.4,p[2]*2.4,5)*.7+f3(p[0]*9,p[1]*9,p[2]*9,3)*.25;
+const vm=Math.exp(-(((lat+12.5+2*Math.sin(lon*.12))/2.2)**2))*cl(1-Math.abs(lon+65)/32,0,1); // Valles Marineris trench
+h+=1.5*gs(p,Q.th,24)+2.4*gs(p,Q.ol,4.5)-1.9*gs(p,Q.he,15)-1.6*vm;
+const a=f3(p[0]*3+7,p[1]*3,p[2]*3,4),dk=cl(sm(.48,.62,a)*.8+.9*gs(p,Q.sy,9)+.6*gs(p,Q.ac,18)+.55*gs(p,Q.sr,14)+.6*gs(p,Q.ga,2.6)+.5*gs(p,Q.je,2.2)+.5*gs(p,Q.me,10)+.9*vm,0,1),br=f3(p[0]*5,p[1]*5+3,p[2]*5,3);
+let r=178+44*br,g=98+72*br,b=56+64*br;r=L(r,80,dk);g=L(g,60,dk);b=L(b,58,dk);
+const cp=sm(74,82,Math.abs(lat)+(a-.5)*14),gn=.94+.12*h3(x,y,9);r=L(r,240,cp)*gn;g=L(g,236,cp)*gn;b=L(b,230,cp)*gn;
+const i=y*TW+x;TC[i*3]=r;TC[i*3+1]=g;TC[i*3+2]=b;TZ[i]=h}}
+/* ============ 3. GLOBE RENDERER (pure Canvas2D, no WebGL) ============ */
+const c=$('c'),x2=c.getContext('2d'),buf=document.createElement('canvas'),bx=buf.getContext('2d');
+let W,Hh,CX,CY,baseR,q=.6,img,la0=-5*D,lo0=100*D,zoom=1,zt=1,vlo=0,vla=0,goal=null,sel=null,hov=null,idle=0,drag=false,live=false,E=[1,0,0],U=[0,1,0],F=[0,0,1],ft=16,fr=0,cur='';
+function resize(){W=innerWidth;Hh=innerHeight;c.width=W;c.height=Hh;const w=W>760;CX=W*(w?.58:.5);CY=Hh*(w?.5:.42);baseR=Math.min(Hh*.36,W*(w?.3:.4));buf.width=Math.round(W*q);buf.height=Math.round(Hh*q);img=bx.createImageData(buf.width,buf.height)}
+function render(){const w=buf.width,h=buf.height,px=img.data,R=baseR*zoom*q,cx=CX*q,cy=CY*q;px.fill(0);
+const sf=Math.sin(la0),cf=Math.cos(la0),so=Math.sin(lo0),co=Math.cos(lo0);E=[-so,0,co];U=[-sf*co,cf,-sf*so];F=[cf*co,sf,cf*so]; // camera basis: east, north, forward
+const lv=[-.5,.38,.78],Lx=lv[0]*E[0]+lv[1]*U[0]+lv[2]*F[0],Ly=lv[0]*E[1]+lv[1]*U[1]+lv[2]*F[1],Lz=lv[0]*E[2]+lv[1]*U[2]+lv[2]*F[2]; // sun fixed in VIEW space
+for(let y=Math.max(0,Math.floor(cy-R));y<=Math.min(h-1,Math.ceil(cy+R));y++){const ny=(cy-y)/R,rr=1-ny*ny;if(rr<0)continue;const hw=Math.sqrt(rr)*R;
+for(let x=Math.max(0,Math.floor(cx-hw));x<=Math.min(w-1,Math.ceil(cx+hw));x++){const nx=(x-cx)/R,z2=1-nx*nx-ny*ny;if(z2<0)continue;const nz=Math.sqrt(z2);
+const ox=nx*E[0]+ny*U[0]+nz*F[0],oy=nx*E[1]+ny*U[1]+nz*F[1],oz=nx*E[2]+ny*U[2]+nz*F[2]; // screen pixel -> point on sphere
+const tu=(Math.atan2(oz,ox)/(2*Math.PI)+.5)*TW-.5,tv=(.5-Math.asin(oy)/Math.PI)*TH-.5,u0=Math.floor(tu),fu=tu-u0,v0=cl(Math.floor(tv),0,TH-1),v1=Math.min(TH-1,v0+1),fv=cl(tv-v0,0,1),ua=((u0%TW)+TW)%TW,ub=(ua+1)%TW;
+const i00=v0*TW+ua,i10=v0*TW+ub,i01=v1*TW+ua,i11=v1*TW+ub,w00=(1-fu)*(1-fv),w10=fu*(1-fv),w01=(1-fu)*fv,w11=fu*fv; // bilinear texture lookup
+let r=TC[i00*3]*w00+TC[i10*3]*w10+TC[i01*3]*w01+TC[i11*3]*w11,g=TC[i00*3+1]*w00+TC[i10*3+1]*w10+TC[i01*3+1]*w01+TC[i11*3+1]*w11,b=TC[i00*3+2]*w00+TC[i10*3+2]*w10+TC[i01*3+2]*w01+TC[i11*3+2]*w11;
+const gE=(TZ[i10]+TZ[i11]-TZ[i00]-TZ[i01])*.5,gN=(TZ[i00]+TZ[i10]-TZ[i01]-TZ[i11])*.5,cc=Math.hypot(ox,oz)||1; // height slope east / north = bump map
+const ex=-oz/cc,ez=ox/cc,nxN=-oy*ox/cc,nyN=cc,nzN=-oy*oz/cc,K=1.5,bx_=ox-K*(gE*ex+gN*nxN),by_=oy-K*(gN*nyN),bz_=oz-K*(gE*ez+gN*nzN),bl=Math.hypot(bx_,by_,bz_);
+const d=(bx_*Lx+by_*Ly+bz_*Lz)/bl,lit=Math.pow(cl(d,0,1),.8),rim=1-nz,hz=Math.pow(rim,3)*.55,bt=Math.exp(-(((d-.08)/.13)**2))*Math.pow(rim,1.4)*70; // light, limb haze, blue Martian sunset
+const o=(y*w+x)*4,f=lit*1.15+.035;px[o]=r*f+(215*hz+bt*.3)*(lit+.1);px[o+1]=g*f+(150*hz+bt*.7)*(lit+.1);px[o+2]=b*f+(115*hz+bt*1.5)*(lit+.1);px[o+3]=255}}
+bx.putImageData(img,0,0)}
+const ST=Array.from({length:170},()=>[Math.random(),Math.random(),Math.random()*1.4+.4,Math.random()*6]);
+const proj=(la,lo)=>{const p=V(la,lo);return[p[0]*E[0]+p[1]*E[1]+p[2]*E[2],p[0]*U[0]+p[1]*U[1]+p[2]*U[2],p[0]*F[0]+p[1]*F[1]+p[2]*F[2]]};
+function paint(t){x2.fillStyle='#04050a';x2.fillRect(0,0,W,Hh);
+for(const s of ST){const a=.35+.5*Math.sin(t/900+s[3]);x2.fillStyle=`rgba(255,235,220,${a})`;x2.fillRect(((s[0]*W-lo0*40)%W+W)%W,s[1]*Hh,s[2],s[2])}
+const R=baseR*zoom,g=x2.createRadialGradient(CX,CY,R*.97,CX,CY,R*1.2);g.addColorStop(0,'rgba(255,140,90,.35)');g.addColorStop(.35,'rgba(255,110,70,.1)');g.addColorStop(1,'rgba(255,100,60,0)');x2.fillStyle=g;x2.beginPath();x2.arc(CX,CY,R*1.2,0,7);x2.fill();
+x2.drawImage(buf,0,0,W,Hh);
+x2.font="700 11px 'Space Mono',monospace";
+for(const s of SITES){const p=proj(s.la,s.lo);s.v=p[2]>.1;if(!s.v)continue;s.sx=CX+p[0]*R;s.sy=CY-p[1]*R;const on=s===sel||s===hov,pl=(t/700)%1,al=cl(p[2]*2,0,1);
+x2.globalAlpha=al;x2.strokeStyle=on?'#5df0ff':'#ff6a3d';x2.lineWidth=1.5;x2.beginPath();x2.arc(s.sx,s.sy,5+pl*14,0,7);x2.globalAlpha=al*(1-pl);x2.stroke();x2.globalAlpha=al;
+x2.fillStyle=on?'#5df0ff':'#ff6a3d';x2.beginPath();x2.arc(s.sx,s.sy,on?6:4,0,7);x2.fill();
+x2.strokeStyle='rgba(255,255,255,.5)';x2.beginPath();x2.moveTo(s.sx+6,s.sy-4);x2.lineTo(s.sx+18,s.sy-16);x2.lineTo(s.sx+26,s.sy-16);x2.stroke();
+x2.fillStyle='#fff';x2.shadowColor='#000';x2.shadowBlur=4;x2.fillText(s.n.toUpperCase(),s.sx+30,s.sy-12);x2.shadowBlur=0;x2.globalAlpha=1}}
+/* ============ 4. MAIN LOOP (physics, camera goal, adaptive quality) ============ */
+let last=0;
+function loop(t){requestAnimationFrame(loop);if(window.OPS)return;const dt=Math.min(.05,(t-last)/1000||.016);last=t;ft=ft*.92+dt*1000*.08;
+if(!drag){if(goal){const k=1-Math.pow(.001,dt);la0+=(goal.la-la0)*k;lo0+=((goal.lo-lo0+Math.PI*3)%(2*Math.PI)-Math.PI)*k}
+else if(Math.abs(vlo)+Math.abs(vla)>.01){lo0+=vlo*dt;la0=cl(la0+vla*dt,-80*D,80*D);vlo*=.94;vla*=.94}
+else{idle+=dt;if(idle>3&&!sel)lo0+=5*D*dt}}
+zoom+=(zt-zoom)*(1-Math.pow(.002,dt));
+if(++fr%40===0){if(ft>30&&q>.4){q=Math.max(.4,q-.1);resize()}else if(ft<15&&q<1){q=Math.min(1,q+.1);resize()}} // Chromebook-friendly: shrink the internal render if slow
+if(fr%8===0){tel();if(wg)wg.gain.setTargetAtTime(.03+.12*(zoom-1)/1.8,AC.currentTime,.3)}
+render();paint(t)}
+/* ============ 5. INTERACTION ============ */
+const ptr=new Map();let moved=0,pd=0;
+c.onpointerdown=e=>{c.setPointerCapture(e.pointerId);ptr.set(e.pointerId,[e.clientX,e.clientY]);drag=ptr.size===1;moved=0;goal=null;idle=0;vlo=vla=0;if(ptr.size===2){const[a,b]=[...ptr.values()];pd=Math.hypot(a[0]-b[0],a[1]-b[1])}};
+c.onpointermove=e=>{const o=ptr.get(e.pointerId),R=baseR*zoom;
+if(o){const dx=e.clientX-o[0],dy=e.clientY-o[1];ptr.set(e.pointerId,[e.clientX,e.clientY]);moved+=Math.abs(dx)+Math.abs(dy);
+if(ptr.size===2){const[a,b]=[...ptr.values()],d=Math.hypot(a[0]-b[0],a[1]-b[1]);zt=cl(zt*d/pd,1,2.8);pd=d}
+else{lo0-=dx/R/Math.cos(la0*.6);la0=cl(la0+dy/R,-80*D,80*D);vlo=-dx/R*50;vla=dy/R*50}idle=0}
+let h=null,m=36;for(const s of SITES)if(s.v){const d=Math.hypot(s.sx-e.clientX,s.sy-e.clientY);if(d<m){m=d;h=s}}
+if(h!==hov){hov=h;if(h)blip(1320,.05,.03)}c.style.cursor=h?'pointer':'grab';
+const nx=(e.clientX-CX)/R,ny=(CY-e.clientY)/R,z2=1-nx*nx-ny*ny;cur='';if(z2>0){const nz=Math.sqrt(z2),py=nx*U[1]+ny*U[1]*0+nz*F[1]+0;const oy=nx*E[1]+ny*U[1]+nz*F[1],ox=nx*E[0]+ny*U[0]+nz*F[0],oz=nx*E[2]+ny*U[2]+nz*F[2];cur=(Math.asin(oy)/D).toFixed(2)+'°  /  '+(Math.atan2(oz,ox)/D).toFixed(2)+'°'}};
+c.onpointerup=e=>{ptr.delete(e.pointerId);drag=ptr.size===1;if(moved<6&&hov)pick(hov);else if(moved<6&&sel&&!hov){}};
+c.onwheel=e=>{e.preventDefault();zt=cl(zt*Math.exp(-e.deltaY*.0015),1,2.8);idle=0;whoosh(.15)};
+c.style.cursor='grab';
+function pick(s){sel=s;goal={la:s.la*D,lo:s.lo*D};zt=2.4;whoosh(.7);blip(660,.12,.06);blip(990,.2,.05);show()}
+function unpick(){sel=null;goal=null;zt=1;idle=0;show();whoosh(.5)}
+function show(){$('card').classList.toggle('on',!!sel);[...$('list').children].forEach((b,i)=>b.classList.toggle('on',SITES[i]===sel));if(!sel)return;
+$('ck').textContent=sel.k;$('cn').textContent=sel.n;$('cc').textContent='LAT '+sel.la+'°  ·  LON '+sel.lo+'°';$('ct').textContent=sel.t;
+const g=$('go');g.disabled=!sel.ready;g.textContent=sel.ready?'ENTER SITE  →':'TERRAIN DATA PENDING'}
+$('go').onclick=()=>{if(sel&&sel.ready){blip(1200,.3,.07);openOps(sel)}};$('x').onclick=unpick;
+onkeydown=e=>{if(e.key==='Escape')unpick()};
+SITES.forEach(s=>s.ready=1);
+SITES.forEach(s=>{const b=document.createElement('button');b.className='it';b.innerHTML=`<b>${s.n}</b><span>${s.la}°, ${s.lo}° · ${s.ready?'MAP READY':'LOCKED'}</span>`;b.onclick=()=>pick(s);b.onmouseenter=()=>blip(1320,.05,.03);$('list').appendChild(b)});
+const tel=()=>{$('tel').innerHTML=`CURSOR <b>${cur||'—'}</b><br>ZOOM <b>${zoom.toFixed(2)}×</b> · RENDER <b>${Math.round(q*100)}%</b> · FRAME <b>${ft.toFixed(0)} ms</b>`};
+/* ============ 6. SOUND (all synthesized with Web Audio — zero audio files) ============ */
+let AC,master,wg,NB,on=true;
+function audio(){if(AC)return AC.state==='suspended'&&AC.resume();AC=new AudioContext();master=AC.createGain();master.gain.value=on?.6:0;master.connect(AC.destination);
+[[55,'sawtooth',.02],[82.4,'sine',.05],[110.4,'sine',.04]].forEach(([f,ty,v])=>{const o=AC.createOscillator(),g=AC.createGain(),l=AC.createBiquadFilter();o.type=ty;o.frequency.value=f;l.type='lowpass';l.frequency.value=320;g.gain.value=v;o.connect(l).connect(g).connect(master);o.start()}); // deep space drone
+NB=AC.createBuffer(1,AC.sampleRate*2,AC.sampleRate);const d=NB.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;
+const s=AC.createBufferSource(),bp=AC.createBiquadFilter(),lf=AC.createOscillator(),lg=AC.createGain();s.buffer=NB;s.loop=true;bp.type='bandpass';bp.frequency.value=520;bp.Q.value=.6;wg=AC.createGain();wg.gain.value=.03;
+s.connect(bp).connect(wg).connect(master);s.start();lf.frequency.value=.07;lg.gain.value=260;lf.connect(lg).connect(bp.frequency);lf.start()} // Martian wind, louder as you zoom in
+function blip(f,d,v){if(!AC||!on)return;const o=AC.createOscillator(),g=AC.createGain(),t=AC.currentTime;o.frequency.value=f;g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g).connect(master);o.start(t);o.stop(t+d)}
+function whoosh(v){if(!AC||!on)return;const s=AC.createBufferSource(),b=AC.createBiquadFilter(),g=AC.createGain(),t=AC.currentTime;s.buffer=NB;b.type='bandpass';b.Q.value=2;b.frequency.setValueAtTime(250,t);b.frequency.exponentialRampToValueAtTime(2200,t+.5);g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(.12*v,t+.2);g.gain.exponentialRampToValueAtTime(.0001,t+.7);s.connect(b).connect(g).connect(master);s.start(t);s.stop(t+.75)}
+$('snd').onclick=()=>{on=!on;$('snd').textContent='SOUND: '+(on?'ON':'OFF');if(master)master.gain.setTargetAtTime(on?.6:0,AC.currentTime,.1)};
+let texURL='',SHIFT=0;
+function useImage(img){const cv=document.createElement('canvas');cv.width=TW;cv.height=TH;const g=cv.getContext('2d');
+ g.drawImage(img,SHIFT,0,TW,TH);g.drawImage(img,SHIFT-TW,0,TW,TH);
+ const d=g.getImageData(0,0,TW,TH).data;
+ for(let i=0;i<TW*TH;i++){TC[i*3]=d[i*4];TC[i*3+1]=d[i*4+1];TC[i*3+2]=d[i*4+2];
+  TZ[i]=(d[i*4]*.3+d[i*4+1]*.59+d[i*4+2]*.11)/255*3}
+ texURL=cv.toDataURL('image/jpeg',.88)}
+$('lt').onclick=()=>$('fl').click();
+$('fl').onchange=e=>{const f=e.target.files[0];if(!f)return;const im=new Image();im.onload=()=>useImage(im);im.src=URL.createObjectURL(f)};
+$('sv').onclick=()=>{if(!texURL)return;const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([texURL]));a.download='tex.txt';a.click()};
+/* ============ 7. BOOT: build texture in slices so the UI never freezes ============ */
+resize();onresize=resize;let row=0;
+(function slice(){genRows(row,Math.min(TH,row+16));row+=16;$('pgi').style.width=row/TH*100+'%';if(row<TH)return setTimeout(slice);
+live=true;$('enter').disabled=false;$('enter').textContent='ENTER MISSION';requestAnimationFrame(loop)})();
+$('enter').onclick=()=>{audio();$('intro').classList.add('off');setTimeout(()=>blip(440,.4,.07),100);setTimeout(()=>blip(660,.5,.06),250)};
+/* MARSWALK — SI-assisted code: written with Claude (Anthropic) as a coding tool, directed and reviewed by the team.
+   Disclosed per the NASA Space Apps SI policy. Data layers are procedural stand-ins modeled on NASA missions (MGS MOLA, MRO HiRISE/CTX/CRISM, ODY THEMIS, MSL RAD). */
+/* ============ 8. OPS: GALE EVA PLANNER (same tab) ============ */
+const N=240,KM=12,SP=KM/N*1000,GH=new Float32Array(N*N),GS=new Float32Array(N*N),GA=new Float32Array(N*N),GM=new Uint8Array(N*N),SH=new Float32Array(N*N);
+const nz=(x,y,s,o,d)=>f3(x*s+d,y*s,d,o),rdg=(x,y,s,d)=>1-Math.abs(2*nz(x,y,s,4,d)-1),G2=(x,y,a,b,sx,sy)=>Math.exp(-(((x-a)/sx)**2+((y-b)/sy)**2));
+let SITE,MC,TG,HAB,EMIN=0,EMAX=1,LAT0=0,LON0=0,OPSKEY='';
+/* One config per site: h = relative terrain height (m), m = mineral class, tg = science targets, hab = base camp. Add a site = add a block. */
+const CF=[
+{n:'Gale Crater',b:-4400,la:-4.8,lo:137.6,to:0,nm:80,hab:[-2,2.2],mc:[['CLAY',[127,209,255]],['SULFATE',[255,226,122]],['HEMATITE',[255,93,115]],['BOXWORK',[180,140,255]],['BASALTIC SAND',[122,127,140]]],
+h:(x,y)=>{const mo=1100*G2(x,y,1.5,-5.5,3.4,3.2),rg=rdg(x,y,.9,40),u=-(y-.1+.4*Math.sin(x*1.3));return mo+110*sm(0,.35,u)*(1-.95*Math.exp(-(((x+2.5)/.7)**2)))+45*rg*rg*(.4+mo/1100)+22*nz(x,y,3,3,9)},
+m:(x,y,m)=>{let c=4;if(m>120)c=1;if(x<-1.5&&y<-1&&m>60)c=0;if(m>420&&x>2)c=3;if(Math.abs(y-(.9-.15*x)+.2*(nz(x,y,3,2,33)-.5))<.35&&x>-1.8&&x<2.8)c=2;return c},
+tg:[{n:'Hematite Ridge',p:[-.5,.9],t:'Iron-oxide ridge, CRISM hematite signature. Short, gentle outing.'},{n:'Sulfate Unit',p:[.6,-2.6],t:'Layered sulfates record the drying of Mars. Sampling stop.'},{n:'Clay Bench',p:[-3.6,-2.2],t:'Clay minerals: water that was once neutral and habitable.'},{n:'Boxwork Ridges',p:[3.4,-4],t:'Mineral-hardened fracture networks, the 2025 Curiosity target. Needs the rover.'}]},
+{n:'Jezero Crater',b:-2600,la:18.45,lo:77.7,to:2,nm:0,hab:[-1,3],mc:[['DELTA CLAY',[127,209,255]],['CARBONATE MARGIN',[255,226,122]],['OLIVINE BASALT',[255,93,115]],['BUTTE UNIT',[180,140,255]],['REGOLITH',[122,127,140]]],
+h:(x,y)=>70*G2(x,y,1.2,.6,2.6,2.2)*(.7+.6*rdg(x,y,2.2,7))+320*G2(x,y,-4.4,-3.4,1.5,1.7)+14*rdg(x,y,1.3,3)**2+8*nz(x,y,4,3,5),
+m:(x,y)=>{let c=4;const r=Math.hypot(x+4.4,y+3.4);if(y<-.6+.8*(nz(x,y,2,2,50)-.5)&&x>-1.5)c=2;if(r>2&&r<3.4)c=1;if(G2(x,y,1.2,.6,2.6,2.2)>.3)c=0;if(G2(x,y,-4.4,-3.4,1.5,1.7)>.3)c=3;return c},
+tg:[{n:'Delta Front',p:[1.2,.8],t:'Layered river-delta deposits: prime biosignature target.'},{n:'Carbonate Margin',p:[-2.4,-1.6],t:'Carbonate-bearing rim of an ancient lake shore.'},{n:'Olivine Plain',p:[1.6,-3],t:'Olivine-rich igneous floor: dateable lava rock.'},{n:'Kodiak Butte',p:[-4.4,-3.4],t:'Eroded delta remnant: climb for a stratigraphy overview. Needs the rover.'}]},
+{n:'Olympus Mons',b:6000,la:18.65,lo:-133.8,to:-4,nm:0,hab:[-3,-4.5],mc:[['FRESH BASALT',[100,110,140]],['DUST MANTLE',[222,170,120]],['LAVA TUBE PIT',[255,93,115]],['FLOW LEVEE',[180,140,255]],['BLOCK FIELD',[127,209,255]]],
+h:(x,y)=>75*(y+6)+55*rdg(x,y,.9,12)**2+30*rdg(x,y,.6,12)**2+8*nz(x,y,4,3,5)-230*G2(x,y,1.5,1,.45,.45)-120*G2(x,y,-2.5,2.8,.4,.35),
+m:(x,y)=>{let c=0;if(nz(x,y,1.5,3,80)>.58)c=1;if(rdg(x,y,.6,12)>.85)c=3;if(nz(x,y,4,2,90)>.7)c=4;if(G2(x,y,1.5,1,.6,.6)>.15||G2(x,y,-2.5,2.8,.5,.45)>.15)c=2;return c},
+tg:[{n:'Lava Tube Skylight',p:[1.5,1.9],t:'Collapse pit into a lava tube: shelter from radiation, steep walls.'},{n:'Flow Levee',p:[-2.5,-1.5],t:'Frozen lava-flow margin. Gives flow rate and viscosity.'},{n:'Dust Mantle Plain',p:[3,-3.5],t:'Thick bright dust: soft ground, easy walking.'},{n:'Upper Flank Overlook',p:[-1,4.5],t:'Highest point of the sector, wide view of the flank. Needs the rover.'}]},
+{n:'Valles Marineris',b:-4500,la:-13.9,lo:-59.2,to:0,nm:0,hab:[-3.5,-4],mc:[['LAYERED SULFATE',[255,226,122]],['WALL BASALT',[100,110,140]],['HYDRATED SILICA',[255,93,115]],['DUNE SAND',[122,127,140]],['LANDSLIDE DEBRIS',[180,140,255]]],
+h:(x,y)=>750*G2(x,y,-1,-1.5,2.4,1.9)+900*sm(1.5,4.5,y)*(1-.65*G2(x,y,3.2,0,1.1,9))+30*rdg(x,y,.9,20)**2+14*nz(x,y,3,3,20),
+m:(x,y)=>{let c=3;const g=G2(x,y,-1,-1.5,2.4,1.9);if(g>.12)c=2;if(g>.25)c=0;if(y>2)c=1;if(y>1.5&&Math.abs(x-3.2)<1.2)c=4;return c},
+tg:[{n:'Layered Mound',p:[-1,-1.2],t:'Interior layered deposit: sulfates deposited by water.'},{n:'Wall Exposure',p:[-3.2,1.2],t:'Foot of a canyon wall exposing kilometers of crust.'},{n:'Opal Rim',p:[1.8,-1.6],t:'Hydrated silica: a strong sign of past water.'},{n:'Landslide Ramp',p:[3.2,3.6],t:'Only slope gentle enough to climb. Rockfall risk. Needs the rover.'}]},
+{n:'Meridiani Planum',b:-1400,la:-1.95,lo:-5.5,to:3,nm:0,hab:[-.5,3.6],mc:[['HEMATITE SPHERULES',[255,93,115]],['SULFATE OUTCROP',[255,226,122]],['BASALTIC SAND',[122,127,140]],['CRATER EJECTA',[180,140,255]],['DUNE FIELD',[127,209,255]]],
+h:(x,y)=>{const cr=(a,b,r,dp)=>{const d=Math.hypot(x-a,y-b)/r;return -dp*Math.max(0,1-d*d)+dp*.25*Math.exp(-(((d-1)/.25)**2))};return cr(1.5,1.5,.5,60)+cr(-2.5,-3,.4,45)+cr(3.2,-1,.35,35)+cr(-3.5,3,.3,30)+cr(0,-4.5,.5,50)+6*rdg(x,y,2.5,3)**2+3*nz(x,y,4,3,5)},
+m:(x,y,m)=>{let c=0;if(nz(x,y,1.6,3,70)>.62)c=2;if(rdg(x,y,2.5,3)>.8)c=4;if(m>11)c=3;if(m<-8)c=1;return c},
+tg:[{n:'Crater Wall',p:[1.5,1.9],t:'Small crater cutting through layered sulfate rock.'},{n:'Spherule Plain',p:[-1.8,-1],t:'Hematite spherules lie on the surface: easy walking, strong spectral signal.'},{n:'Sulfate Outcrop',p:[3.2,-.5],t:'Bedrock exposed at a crater rim.'},{n:'Dune Field',p:[-3.2,3.6],t:'Wind-blown sand ripples: check the thermal layer for trafficability.'}]},
+{n:'Hellas Planitia',b:-7000,la:-42.4,lo:70.5,to:-14,nm:0,hab:[-1.2,.5],mc:[['EVAPORITE',[255,226,122]],['LAYERED TERRACE',[127,209,255]],['DUNE SAND',[122,127,140]],['MASSIF BRECCIA',[180,140,255]],['SEASONAL FROST',[240,245,255]]],
+h:(x,y)=>12*rdg(x,y,1.1,4)**2+16*nz(x,y,2.8,3,2)+300*sm(2.2,5.5,y)-40*rdg(x,y,2.2,33)*sm(3,5,y)+230*G2(x,y,-3,-3.5,1.2,1),
+m:(x,y)=>{let c=2;if(y<0&&nz(x,y,1.5,3,60)>.45)c=0;if(y>2.5)c=1;if(G2(x,y,-3,-3.5,1.5,1.2)>.3)c=3;if(y>2.2&&nz(x,y,2,2,90)>.62)c=4;return c},
+tg:[{n:'Terrace Layers',p:[.5,4.3],t:'Layered basin-fill exposed in a terrace.'},{n:'Evaporite Flats',p:[3,-3],t:'Bright salt-rich flats: signs of an ancient basin lake.'},{n:'Massif Flank',p:[-3,-2.2],t:'Impact-uplifted rock from deep in the crust.'},{n:'Frost Gully',p:[2.5,3.6],t:'Seasonal frost and gullies. Thick air, but very cold. Needs the rover.'}]}];
+const LN=['OPTICAL','TOPO','THERMAL','SPECTRAL','RADIATION','HAZARD'],SRC=['MRO HiRISE','MGS MOLA','ODY THEMIS','MRO CRISM','MSL RAD','SLOPE MODEL'];
+const LG=[['linear-gradient(90deg,#cd8454,#604a46)','BRIGHT DUST','DARK SAND'],['linear-gradient(90deg,#28285a,#286e8c,#78aa6e,#dcc878,#c8784a,#faf0e6)','−4,400 m','−3,250 m'],['linear-gradient(90deg,#140a3c,#5a146e,#be325a,#fa8228,#fce678)','−95 °C','+5 °C'],0,['linear-gradient(90deg,#28c878,#e6dc3c,#f05032)','20 µSv/h','130 µSv/h'],['linear-gradient(90deg,#28c878 25%,#e6dc3c 25% 50%,#f08c28 50% 75%,#f0323c 75%)','<8° EASY','>21° NO-GO']];
+const TOPO=[[40,40,90],[40,110,140],[120,170,110],[220,200,120],[200,120,70],[250,240,230]],THR=[[20,10,60],[90,20,110],[190,50,90],[250,130,40],[252,230,120]],RADC=[[40,200,120],[230,220,60],[240,80,50]];
+const RP=(s,t)=>{t=cl(t,0,1)*(s.length-1);const a=Math.floor(t),b=Math.min(s.length-1,a+1),f=t-a;return[L(s[a][0],s[b][0],f),L(s[a][1],s[b][1],f),L(s[a][2],s[b][2],f)]};
+const oc=$('oc'),og=oc.getContext('2d'),mc=document.createElement('canvas'),mcx=mc.getContext('2d');mc.width=mc.height=N;
+let LY=0,MODE=0,WP=[],PATH=[],BASE=null,HI=null,HC=0,hvk=null,S=1,X0=0,Y0=0,OW=1,OH=1,OD=1,STT={};
+const H_=()=>+$('o-tm').value,SPE=()=>$('o-sp').checked;
+const cx_=x=>Math.round((x+6)/KM*N-.5),cy_=y=>Math.round((6-y)/KM*N-.5),px_=i=>X0+(i+.5)/N*S,py_=j=>Y0+(j+.5)/N*S;
+function genTerrain(){MC=SITE.mc;TG=SITE.tg;HAB=SITE.hab;LAT0=SITE.la;LON0=SITE.lo;const T=SITE;let lo=1e9,hi=-1e9;
+for(let j=0;j<N;j++)for(let i=0;i<N;i++){const x=-6+(i+.5)*KM/N,y=6-(j+.5)*KM/N,k=j*N+i;GH[k]=T.b+T.h(x,y);GA[k]=.1+.18*nz(x,y,2,4,11);lo=Math.min(lo,GH[k]);hi=Math.max(hi,GH[k])}
+EMIN=lo;EMAX=hi;const g=(a,b)=>GH[cl(b,0,N-1)*N+cl(a,0,N-1)];
+for(let j=0;j<N;j++)for(let i=0;i<N;i++){const k=j*N+i,x=-6+(i+.5)*KM/N,y=6-(j+.5)*KM/N,gx=(g(i+1,j)-g(i-1,j))/(2*SP),gy=(g(i,j+1)-g(i,j-1))/(2*SP);
+GS[k]=Math.atan(Math.hypot(gx,gy))/D;SH[k]=cl(.62+1.7*(gx+gy),.25,1.35);GM[k]=T.m(x,y,GH[k]-T.b+T.nm*(nz(x,y,2,3,21)-.5))}
+HC=snap(cx_(HAB[0]),cy_(HAB[1]))}
+function setNames(){$('o-nm').textContent=SITE.n.toUpperCase();$('o-tl').innerHTML=SITE.n.toUpperCase()+' · '+SITE.la+'°, '+SITE.lo+'°<br>12 × 12 KM EVA SECTOR';$('o-b1').textContent='▸ MARSWALK HUD · '+SITE.n.toUpperCase()}
+function snap(i,j){let best=null,bd=1e9;for(let dj=-5;dj<=5;dj++)for(let di=-5;di<=5;di++){const a=i+di,b=j+dj;if(a<0||b<0||a>=N||b>=N)continue;const k=b*N+a;if(GS[k]<(MODE?14:15)){const d=di*di+dj*dj;if(d<bd){bd=d;best=k}}}return best}
+const tempK=(k,hh)=>{hh=((hh%24.6)+24.6)%24.6;const dp=Math.max(0,Math.sin(Math.PI*(hh-5.5)/13));return -80+78*Math.pow(dp,.8)+(.18-GA[k])*60*dp-(GH[k]+4400)/1000+SITE.to}; // diurnal surface temperature
+const dose=k=>27*(1+(GH[k]+4400)/1000*.06)*(1-Math.min(.15,GS[k]/120))*(SPE()?4:1); // µSv/h, 27 ≈ MSL RAD at Gale
+function paintLayer(){const d=mcx.createImageData(N,N),hh=H_();for(let k=0;k<N*N;k++){let c,sh=SH[k];const h=GH[k],i=k%N,j=(k/N)|0;
+if(LY===0){if(BASE)c=[BASE[k*4],BASE[k*4+1],BASE[k*4+2]];else{const a=(GA[k]-.1)/.18;c=[L(205,96,a),L(132,74,a),L(84,70,a)]}const n=.94+.12*h3(i,j,3);c=BASE?c.map(v=>v*(.9+.1*sh)):c.map(v=>v*sh*n)}
+else if(LY===1){c=RP(TOPO,(h-EMIN)/(EMAX-EMIN+1));let f=.55+.45*sh;if(i<N-1&&Math.floor(h/50)!==Math.floor(GH[k+1]/50))f*=.55;c=c.map(v=>v*f)}
+else if(LY===2){c=RP(THR,(tempK(k,hh)+95)/100).map(v=>v*(.7+.3*sh))}
+else if(LY===3){c=MC[GM[k]][1].map(v=>v*(.5+.5*sh))}
+else if(LY===4){c=RP(RADC,(dose(k)-20)/110).map(v=>v*(.7+.3*sh))}
+else{const s=GS[k];c=(s<8?[40,200,120]:s<15?[230,220,60]:s<21?[240,140,40]:[240,50,60]).map(v=>v*(.55+.45*sh))}
+d.data[k*4]=c[0];d.data[k*4+1]=c[1];d.data[k*4+2]=c[2];d.data[k*4+3]=255}mcx.putImageData(d,0,0)}
+function astar(a,b){const G=new Float32Array(N*N).fill(1e9),P=new Int32Array(N*N).fill(-1),cd=new Uint8Array(N*N),hp=[[0,a]],lim=MODE?18:21;G[a]=0;
+const push=(f,n)=>{hp.push([f,n]);let i=hp.length-1;while(i>0){const p=(i-1)>>1;if(hp[p][0]<=hp[i][0])break;[hp[p],hp[i]]=[hp[i],hp[p]];i=p}},
+pop=()=>{const t=hp[0],e=hp.pop();if(hp.length){hp[0]=e;let i=0;for(;;){const l=2*i+1,r=l+1;let m=i;if(l<hp.length&&hp[l][0]<hp[m][0])m=l;if(r<hp.length&&hp[r][0]<hp[m][0])m=r;if(m===i)break;[hp[m],hp[i]]=[hp[i],hp[m]];i=m}}return t},bi=b%N,bj=(b/N)|0;
+while(hp.length){const[,n]=pop();if(n===b)break;if(cd[n])continue;cd[n]=1;const ni=n%N,nj=(n/N)|0;
+for(let dj=-1;dj<=1;dj++)for(let di=-1;di<=1;di++){if(!di&&!dj)continue;const mi=ni+di,mj=nj+dj;if(mi<0||mj<0||mi>=N||mj>=N)continue;const m=mj*N+mi,s=Math.max(GS[m],GS[n]);if(s>lim)continue;
+const g=G[n]+Math.hypot(di,dj)*(1+(s/9)**2);if(g<G[m]){G[m]=g;P[m]=n;push(g+Math.hypot(bi-mi,bj-mj),m)}}} // A* where cost grows with slope squared
+if(P[b]<0&&a!==b)return null;const r=[];for(let n=b;n!==-1;n=P[n])r.push(n);return r.reverse()}
+function compute(){const pts=[HC,...WP];if($('rt').checked&&WP.length)pts.push(HC);PATH=[];
+for(let a=0;a<pts.length-1;a++){const p=astar(pts[a],pts[a+1]);if(!p)return false;PATH.push(...(a?p.slice(1):p))}
+if(!PATH.length)PATH=[HC];stats();return true}
+function stats(){let dist=0,tim=WP.length/3,ds=0,mxs=0,far=0,tmin=1e9;const t0=H_(),v0=MODE?8:2.2,hx=HC%N,hy=(HC/N)|0,lim=MODE?18:21; // 20 min science stop per waypoint
+for(let i=1;i<PATH.length;i++){const a=PATH[i-1],b=PATH[i],d=Math.hypot(a%N-b%N,((a/N)|0)-((b/N)|0))*SP/1000,s=Math.max(GS[a],GS[b]),v=v0/(1+s/(MODE?10:12)),dt=d/v;
+dist+=d;tim+=dt;ds+=dose(b)*dt;mxs=Math.max(mxs,s);tmin=Math.min(tmin,tempK(b,t0+tim));far=Math.max(far,Math.hypot(b%N-hx,((b/N)|0)-hy)*SP/1000)}
+ds+=WP.reduce((q,k)=>q+dose(k)/3,0);const st=tim>7.5||ds>1000||mxs>lim?['NO-GO','ng']:tim>6.5||ds>500?['CAUTION','ca']:['GO','go2'];
+const hm=x=>Math.floor(x)+'h '+String(Math.round(x%1*60)).padStart(2,'0')+'m';
+$('o-st').innerHTML=`<div id="chip" class="${st[1]}">EVA ${st[0]}</div><div class="sg"><div>DISTANCE<b>${dist.toFixed(1)} km</b></div><div>EVA TIME (8 h SUIT)<b>${hm(tim)}</b></div><div>MAX SLOPE<b>${mxs.toFixed(1)}°</b></div><div>MISSION DOSE<b>${(ds/1000).toFixed(2)} mSv</b></div><div>MIN SURFACE TEMP<b>${tmin>1e8?'—':tmin.toFixed(0)+' °C'}</b></div><div>FARTHEST FROM HAB<b>${far.toFixed(1)} km</b></div></div>`}
+function flash(t){const f=$('fm');f.textContent=t;f.classList.add('on');setTimeout(()=>f.classList.remove('on'),1800)}
+function addWP(k){WP.push(k);if(!compute()){WP.pop();compute();flash('NO SAFE PATH · SLOPE ABOVE LIMIT');return}blip(880,.1,.06)}
+function setLayer(n){LY=n;[...$('o-ly').children].forEach((b,i)=>b.classList.toggle('on',i===n));const l=n===1?[LG[1][0],EMIN.toFixed(0)+' m',EMAX.toFixed(0)+' m']:LG[n];
+$('o-lg').innerHTML=n===3?'<div class="chips">'+MC.map(m=>`<i style="background:rgb(${m[1]})">${m[0]}</i>`).join('')+'</div>':`<div class="lg" style="background:${l[0]}"></div><div class="lgl"><span>${l[1]}</span><span>${l[2]}</span></div>`;paintLayer();blip(700,.08,.05)}
+function resizeOps(){const w=$('mw');OW=w.clientWidth;OH=w.clientHeight;OD=Math.min(2,devicePixelRatio||1);oc.width=OW*OD;oc.height=OH*OD;S=Math.min(OW,OH)*.98;X0=(OW-S)/2;Y0=(OH-S)/2}
+function readout(k){const i=k%N,j=(k/N)|0,x=-6+(i+.5)*KM/N,y=6-(j+.5)*KM/N,la=LAT0+y/59.27,lo=LON0+x/(59.27*Math.cos(LAT0*D));
+return`LAT <b>${la.toFixed(3)}°</b> LON <b>${lo.toFixed(3)}°</b><br>ELEV <b>${GH[k].toFixed(0)} m</b> · SLOPE <b>${GS[k].toFixed(1)}°</b><br>TEMP <b>${tempK(k,H_()).toFixed(0)} °C</b> · DOSE <b>${dose(k).toFixed(0)} µSv/h</b><br>MINERAL <b>${MC[GM[k]][0]}</b>`}
+function opsFrame(t){if(!window.OPS)return;requestAnimationFrame(opsFrame);const g=og;g.setTransform(OD,0,0,OD,0,0);g.clearRect(0,0,OW,OH);g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';g.drawImage(LY===0&&HI?HI:mc,X0,Y0,S,S);
+g.strokeStyle='rgba(93,240,255,.12)';g.lineWidth=1;g.beginPath();for(let n=0;n<=12;n++){const p=n*S/12;g.moveTo(X0+p,Y0);g.lineTo(X0+p,Y0+S);g.moveTo(X0,Y0+p);g.lineTo(X0+S,Y0+p)}g.stroke();
+if(PATH.length>1){g.save();g.shadowColor='#5df0ff';g.shadowBlur=10;g.strokeStyle='#5df0ff';g.lineWidth=2.5;g.setLineDash([10,7]);g.lineDashOffset=-t/45;g.beginPath();PATH.forEach((k,n)=>{const X=px_(k%N),Y=py_((k/N)|0);n?g.lineTo(X,Y):g.moveTo(X,Y)});g.stroke();g.restore();
+const a=PATH[Math.floor((t/14000)%1*(PATH.length-1))],ax=px_(a%N),ay=py_((a/N)|0),p=(t/500)%1;g.strokeStyle='#fff';g.globalAlpha=1-p;g.beginPath();g.arc(ax,ay,5+p*14,0,7);g.stroke();g.globalAlpha=1;g.fillStyle='#fff';g.beginPath();g.arc(ax,ay,4,0,7);g.fill()}
+g.font="700 11px 'Space Mono',monospace";g.shadowColor='#000';g.shadowBlur=4;
+TG.forEach(s=>{const X=px_(cx_(s.p[0])),Y=py_(cy_(s.p[1]));g.strokeStyle='#ffb347';g.lineWidth=1.8;g.beginPath();g.moveTo(X,Y-8);g.lineTo(X+8,Y);g.lineTo(X,Y+8);g.lineTo(X-8,Y);g.closePath();g.stroke();g.fillStyle='#ffd9a0';g.fillText(s.n.toUpperCase(),X+12,Y+4)});
+const hx=px_(HC%N),hy=py_((HC/N)|0);g.fillStyle='#ff6a3d';g.fillRect(hx-7,hy-7,14,14);g.fillStyle='#fff';g.fillText('HAB · LANDING SITE',hx+12,hy+4);
+WP.forEach((k,n)=>{const X=px_(k%N),Y=py_((k/N)|0);g.fillStyle='#5df0ff';g.beginPath();g.arc(X,Y,9,0,7);g.fill();g.fillStyle='#04101a';g.fillText(n+1,X-3.5,Y+4)});g.shadowBlur=0;
+if(hvk!=null){const X=px_(hvk%N),Y=py_((hvk/N)|0);g.strokeStyle='#fff';g.lineWidth=1;g.beginPath();g.arc(X,Y,12,0,7);g.moveTo(X-20,Y);g.lineTo(X-6,Y);g.moveTo(X+6,Y);g.lineTo(X+20,Y);g.moveTo(X,Y-20);g.lineTo(X,Y-6);g.moveTo(X,Y+6);g.lineTo(X,Y+20);g.stroke()}
+g.strokeStyle='#fff';g.lineWidth=2;g.beginPath();g.moveTo(X0+12,Y0+S-14);g.lineTo(X0+12+S/12,Y0+S-14);g.stroke();g.fillStyle='#fff';g.fillText('1 KM',X0+12,Y0+S-20);g.fillText('N ↑',X0+S-34,Y0+18)}
+function openOps(s){SITE=CF.find(c=>c.n===(s&&s.n))||CF[0];window.OPS=1;$('ops').classList.add('on');const b=$('boot');b.classList.remove('run');void b.offsetWidth;b.classList.add('run');
+if(OPSKEY!==SITE.n){OPSKEY=SITE.n;BASE=null;HI=null;WP=[];genTerrain();setNames();loadSaved();WP=[snap(cx_(TG[0].p[0]),cy_(TG[0].p[1])),snap(cx_(TG[1].p[0]),cy_(TG[1].p[1]))];if(MODE&&!compute())WP=[];
+$('o-ly').innerHTML=LN.map((n,i)=>`<button class="b" data-i="${i}">${n}<br><span style="color:var(--mu);font-size:9px">${SRC[i]}</span></button>`).join('');[...$('o-ly').children].forEach(e=>e.onclick=()=>setLayer(+e.dataset.i));
+$('o-tg').innerHTML=TG.map((s,i)=>`<button class="b" data-i="${i}"><b style="color:#ffb347">◆ ${s.n}</b><br><span style="font-size:10px;color:var(--mu)">${s.t}</span></button>`).join('');[...$('o-tg').children].forEach(e=>e.onclick=()=>{const s=TG[+e.dataset.i],k=snap(cx_(s.p[0]),cy_(s.p[1]));if(k!=null)addWP(k)})}
+resizeOps();compute();setLayer(LY);$('clk').innerHTML='SOL 4,700+ · MISSION CLOCK<br>LOCAL '+tl();requestAnimationFrame(opsFrame)}
+const tl=()=>{const h=H_();return String(Math.floor(h)).padStart(2,'0')+':'+String(Math.floor(h%1*60)).padStart(2,'0')};
+function upd(){$('o-tv').textContent=tl();$('clk').innerHTML='SOL 4,700+ · MISSION CLOCK<br>LOCAL '+tl();paintLayer();stats()}
+$('o-tm').oninput=upd;$('o-sp').onchange=()=>{paintLayer();stats();blip(300,.2,.06)};$('o-tv').textContent='09:00';
+$('o-bk').onclick=()=>{window.OPS=0;$('ops').classList.remove('on');whoosh(.5)};
+$('m0').onclick=()=>{MODE=0;$('m0').classList.add('on');$('m1').classList.remove('on');if(!compute()){WP=[];compute()}blip(500,.1,.05)};
+$('m1').onclick=()=>{MODE=1;$('m1').classList.add('on');$('m0').classList.remove('on');if(!compute()){WP=[];compute();flash('ROUTE RESET · SLOPE ABOVE ROVER LIMIT')}blip(900,.1,.05)};
+$('rt').onchange=()=>compute();$('o-un').onclick=()=>{WP.pop();compute()};$('o-cl').onclick=()=>{WP=[];compute()};
+$('o-bm').onclick=()=>$('o-fl').click();$('o-fl').onchange=e=>{const f=e.target.files[0];if(!f)return;const im=new Image();im.onload=()=>{useBase(im,1);setLayer(0);flash('BASEMAP LOADED')};im.src=URL.createObjectURL(f)};
+function useBase(im,sv){const hi=document.createElement('canvas');hi.width=hi.height=720;const w=im.naturalWidth||im.width,h=im.naturalHeight||im.height,q=Math.min(w,h),sx=(w-q)/2,sy=(h-q)/2;hi.getContext('2d').drawImage(im,sx,sy,q,q,0,0,720,720);HI=hi;const cv=document.createElement('canvas');cv.width=cv.height=N;const g=cv.getContext('2d');g.drawImage(im,sx,sy,q,q,0,0,N,N);try{BASE=g.getImageData(0,0,N,N).data}catch(e){BASE=null}
+if(sv){try{localStorage.setItem('mw_'+SITE.n,hi.toDataURL('image/jpeg',.85))}catch(e){}}} // keep each site's photo in this browser
+function loadSaved(){const nm=SITE.n;let u=window.EMB&&EMB[nm];if(!u){try{u=localStorage.getItem('mw_'+nm)}catch(e){}}
+const sl=nm.split(' ')[0].toLowerCase(),ex=u?[u]:['basemaps/'+sl+'.jpg','basemaps/'+sl+'.png'];
+(function t(i){if(i>=ex.length)return;const im=new Image();im.onload=()=>{if(SITE.n===nm){useBase(im,0);paintLayer()}};im.onerror=()=>t(i+1);im.src=ex[i]})(0)} // auto-load basemaps/gale.jpg etc. from the folder next to the page
+function cellAt(e){const r=oc.getBoundingClientRect(),i=Math.floor((e.clientX-r.left-X0)/S*N),j=Math.floor((e.clientY-r.top-Y0)/S*N);return i<0||j<0||i>=N||j>=N?null:[i,j]}
+oc.onpointermove=e=>{const c=cellAt(e);hvk=c?c[1]*N+c[0]:null;$('rd').innerHTML=hvk==null?'':readout(hvk)};
+oc.onclick=e=>{const c=cellAt(e);if(!c)return;const k=snap(c[0],c[1]);if(k==null)return flash('SLOPE TOO STEEP FOR EVA');addWP(k)};
+addEventListener('resize',()=>{if(window.OPS)resizeOps()});
+</script></body></html>
